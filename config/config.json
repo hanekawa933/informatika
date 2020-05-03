@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "hanekawa",
+    "database": "hmj",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "logging": "console.log"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "hanekawa",
+    "database": "hmj",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "hanekawa",
+    "database": "hmj",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

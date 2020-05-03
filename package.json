@@ -1,0 +1,31 @@
+{
+  "name": "Informatika",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon App",
+    "migration": "npx sequelize-cli db:migrate",
+    "seeding": "npx sequelize-cli db:seed:all",
+    "undo-migration": "npx sequelize-cli db:migrate:undo:all",
+    "undo-seeding": "npx sequelize-cli db:seed:undo:all"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.1",
+    "express": "^4.17.1",
+    "express-validator": "^6.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^7.18.2",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^5.21.5",
+    "sequelize-cli": "^5.5.1",
+    "uuid": "^7.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
