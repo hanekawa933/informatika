@@ -1,0 +1,2 @@
+export const DOKUMEN_DELETED = "DOKUMEN_DELETED";
+export const DELETE_ERROR = "DELETE_ERROR";

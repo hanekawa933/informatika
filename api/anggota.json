@@ -1,0 +1,19 @@
+{
+  "nama_depan": "testdata",
+  "nama_belakang": "testdata",
+  "tempat": "testdata",
+  "tgl_lahir": "2000-05-11",
+  "agama_id": 1,
+  "alamat": "testdata",
+  "pekerjaan": "testdata",
+  "nim": "2018104313",
+  "divisi_id": 1,
+  "jabatan": "testdata",
+  "angkatan": "2020",
+  "foto": "testdata.jpg",
+  "whatsapp": "082298546467",
+  "email": "iqbalkorompiz@gmail.com",
+  "facebook": "iqbal ramadhan",
+  "twitter": "@hanekawa_hanbei",
+  "instagram": "@hanekawa_shirayuki"
+}

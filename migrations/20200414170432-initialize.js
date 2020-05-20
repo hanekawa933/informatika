@@ -94,9 +94,9 @@ module.exports = {
         id: PKCascade(),
         username: notNullString(15),
         password: notNullString(255),
-        nama: notNullString(35),
+        anggota_id: references("anggota"),
         created_by: notNullString(35),
-        updated_by: notNullString(35),
+        updated_by: nullableString(35),
         createdAt: notNullDate(),
         updatedAt: notNullDate(),
       });
@@ -104,9 +104,15 @@ module.exports = {
 
     return await Promise.all([
       administrator("administrator"),
-      penanggungJawab("pjAnggota"),
-      penanggungJawab("pjDokumen"),
-      penanggungJawab("pjEvent"),
+
+      queryInterface.createTable("divisi", {
+        id: PKCascade(),
+        divisi: notNullString(100),
+        createdAt: notNullDate(),
+        updatedAt: notNullDate(),
+      }),
+
+      penanggungJawab("admin_divisi"),
 
       queryInterface.createTable("agama", {
         id: PKCascade(),
@@ -130,6 +136,7 @@ module.exports = {
         nim: notNullString(15),
         jabatan: notNullString(50),
         angkatan: notNullString(4),
+        divisi_id: references("divisi"),
         foto: notNullString(255),
         created_by: nullableString(35),
         updated_by: nullableString(35),
@@ -200,7 +207,7 @@ module.exports = {
         id: primaryKey(),
         nama: notNullString(70),
         description: notNullText(),
-        sifat: notNullString(20),
+        jenis_file: notNullString(20),
         tipe_file: notNullString(20),
         file: notNullString(255),
         created_by: notNullString(35),
@@ -214,6 +221,8 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return Promise.all([
       queryInterface.dropTable("administrator", { cascade: true }),
+      queryInterface.dropTable("divisi", { cascade: true }),
+      queryInterface.dropTable("admin_divisi", { cascade: true }),
       queryInterface.dropTable("pjAnggota", { cascade: true }),
       queryInterface.dropTable("pjDokumen", { cascade: true }),
       queryInterface.dropTable("pjEvent", { cascade: true }),

@@ -1,0 +1,2 @@
+export const EVENT_UPDATED = "EVENT_UPDATED";
+export const UPDATE_ERROR = "UPDATE_ERROR";

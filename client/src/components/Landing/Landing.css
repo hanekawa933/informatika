@@ -1,0 +1,37 @@
+.background {
+  background-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.7),
+      rgba(0, 0, 0, 0.9)
+    ),
+    url("../../images//landing-bg.jpg");
+  background-position: center;
+  background-size: cover;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+}
+
+.landing:hover {
+  background: transparent;
+  transition: 0.5s;
+  border-bottom: 2px solid #ccc;
+}
+
+.ls-title {
+  letter-spacing: 0.1em;
+}
+.ls-sub-title {
+  letter-spacing: 0.3em;
+}
+
+.m-landing {
+  margin-left: 12%;
+}
+
+.button-landing {
+  width: 30%;
+  padding: 10px;
+}

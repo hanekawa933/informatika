@@ -1,0 +1,11 @@
+.bg-primary-secondary {
+  background: #272343;
+}
+
+.bg-primary-secondary-gradient {
+  background: linear-gradient(to right, #272343, #7a72aa);
+}
+
+.bg-green {
+  background: #96c75a;
+}

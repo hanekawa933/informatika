@@ -8,7 +8,9 @@
     "migration": "npx sequelize-cli db:migrate",
     "seeding": "npx sequelize-cli db:seed:all",
     "undo-migration": "npx sequelize-cli db:migrate:undo:all",
-    "undo-seeding": "npx sequelize-cli db:seed:undo:all"
+    "undo-seeding": "npx sequelize-cli db:seed:undo:all",
+    "client": "cd ./client && npm run start",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
@@ -16,6 +18,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "config": "^3.3.1",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-validator": "^6.4.0",
     "jsonwebtoken": "^8.5.1",
@@ -26,6 +29,7 @@
     "uuid": "^7.0.2"
   },
   "devDependencies": {
+    "concurrently": "^5.2.0",
     "nodemon": "^2.0.2"
   }
 }

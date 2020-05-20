@@ -1,0 +1,17 @@
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 500px;
+}
+
+.bg-primary-secondary {
+  background: #272343;
+}
+
+.nav-item:hover {
+  background: #524d75;
+}
+
+.fs-20 {
+  font-size: 1.25em;
+}

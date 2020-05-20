@@ -5,14 +5,14 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 
 const auth = require("../../middleware/auth");
-const {
-  M_Administrator,
-  M_pjAnggota,
-  M_pjDokumen,
-  M_pjEvent,
-} = require("../../models/M_SuperUser");
+const { M_Administrator, M_Admin_Divisi } = require("../../models/M_SuperUser");
 
-const { M_Agama, M_Anggota, M_Sosmed } = require("../../models/M_Anggota");
+const {
+  M_Agama,
+  M_Anggota,
+  M_Sosmed,
+  M_Divisi,
+} = require("../../models/M_Anggota");
 
 const {
   M_Event,
@@ -52,7 +52,9 @@ const create = (params, model) => {
           password,
           nama,
         });
-        res.status(200).send("Account Successfully Created");
+
+        delete user.dataValues["id"];
+        res.status(200).send(user);
       }
     } catch (err) {
       console.error(err.message);
@@ -63,7 +65,7 @@ const create = (params, model) => {
 // Create All Users
 const createPJ = (params, modelAdmin, model) => {
   router.post(params, auth, async (req, res) => {
-    let { username, password, nama } = req.body;
+    let { username, password, anggota_id } = req.body;
     try {
       // See if user exists
       let user = await model.findOne({ where: { username } });
@@ -81,15 +83,16 @@ const createPJ = (params, modelAdmin, model) => {
         password = await bcrypt.hash(password, salt);
 
         admin = await modelAdmin.findByPk(req.user.id);
-        console.log(admin.nama);
 
         user = await model.create({
           username,
           password,
-          nama,
+          anggota_id,
           created_by: admin.nama,
         });
-        res.status(200).send("Account Successfully Created");
+
+        delete user.dataValues["id"];
+        res.status(200).send(user);
       }
     } catch (err) {
       console.error(err.message);
@@ -101,17 +104,29 @@ const createPJ = (params, modelAdmin, model) => {
 // Create User Admin
 create("/", M_Administrator);
 // Create User PJ Event
-createPJ("/pjEvent", M_Administrator, M_pjEvent);
-// Create User PJ Document
-createPJ("/pjDokumen", M_Administrator, M_pjDokumen);
-// Create User PJ Document
-createPJ("/pjAnggota", M_Administrator, M_pjAnggota);
+createPJ("/test", M_Administrator, M_Admin_Divisi);
 
 // Get All Users
 const get = (params, model) => {
   router.get(params, auth, async (req, res) => {
     try {
-      const user = await model.findAll();
+      const user = await model.findAll({
+        attributes: { exclude: ["id", "divisi_id"] },
+        include: [
+          {
+            model: M_Anggota,
+            required: true,
+            attributes: { exclude: ["id"] },
+            include: [
+              {
+                model: M_Divisi,
+                required: true,
+                attributes: { exclude: ["id"] },
+              },
+            ],
+          },
+        ],
+      });
       res.json(user);
     } catch (error) {
       console.error(error.message);
@@ -120,20 +135,25 @@ const get = (params, model) => {
   });
 };
 
-// Get All User Admin
+//Get All User Admin
 get("/", M_Administrator);
-// Get All User PJ Event
-get("/pjEvent", M_pjEvent);
-// Get All User PJ Anggota
-get("/pjAnggota", M_pjAnggota);
-// Get All User PJ Document
-get("/pjDokumen", M_pjDokumen);
+
+// Get All User PJ
+get("/test", M_Admin_Divisi);
+
+// // Get All User PJ Anggota
+// get("/pjAnggota", M_pjAnggota);
+// // Get All User PJ Document
+// get("/pjDokumen", M_pjDokumen);
 
 // Get Single Users
 const getOne = (params, model) => {
   router.get(params, auth, async (req, res) => {
     try {
-      const user = await model.findOne({ where: { id: req.params.id } });
+      const user = await model.findOne({
+        where: { username: req.params.username },
+        attributes: { exclude: ["id"] },
+      });
       if (!user) {
         res.status(400).json({
           errors: [
@@ -153,20 +173,20 @@ const getOne = (params, model) => {
 };
 
 // Get Single User Admin
-getOne("/:id", M_Administrator);
-// Get Single User PJ Event
-getOne("/pjEvent/:id", M_pjEvent);
-// Get Single User PJ Anggota
-getOne("/pjAnggota/:id", M_pjAnggota);
-// Get Single User PJ Document
-getOne("/pjDokumen/:id", M_pjDokumen);
+getOne("/:username", M_Administrator);
+// // Get Single User PJ Event
+// getOne("/pjEvent/:username", M_pjEvent);
+// // Get Single User PJ Anggota
+// getOne("/pjAnggota/:username", M_pjAnggota);
+// // Get Single User PJ Document
+// getOne("/pjDokumen/:username", M_pjDokumen);
 
 const update = (params, model) => {
   router.put(params, auth, async (req, res) => {
     let { username, password, nama } = req.body;
     try {
       const isExists = await model.findOne({
-        where: { id: req.params.id },
+        where: { username: req.params.username },
       });
 
       if (!isExists) {
@@ -205,9 +225,10 @@ const update = (params, model) => {
               password,
               nama,
             },
-            { where: { id: req.params.id } }
+            { where: { username: req.params.username } }
           );
-          res.status(200).send("Sucessfully updated");
+          console.log(user);
+          res.status(200).send(user);
         }
       }
     } catch (error) {
@@ -263,7 +284,7 @@ const updatePJ = (params, modelUpdate, model) => {
               nama,
               updated_by: updatedBy.nama,
             },
-            { where: { id: req.params.id } }
+            { where: { username: req.params.username } }
           );
           res.status(200).send("Sucessfully updated");
         }
@@ -276,13 +297,13 @@ const updatePJ = (params, modelUpdate, model) => {
 };
 
 // Update User Admin
-update("/:id", M_Administrator);
-// Update User PJ Event
-updatePJ("/pjEvent/:id", M_Administrator, M_pjEvent);
-// Update User PJ Anggota
-updatePJ("/pjAnggota/:id", M_Administrator, M_pjAnggota);
-// Update User PJ Dokumen
-updatePJ("/pjDokumen/:id", M_Administrator, M_pjDokumen);
+update("/:username", M_Administrator);
+// // Update User PJ Event
+// updatePJ("/pjEvent/:username", M_Administrator, M_pjEvent);
+// // Update User PJ Anggota
+// updatePJ("/pjAnggota/:username", M_Administrator, M_pjAnggota);
+// // Update User PJ Dokumen
+// updatePJ("/pjDokumen/:username", M_Administrator, M_pjDokumen);
 
 // Delete Data User
 const Delete = (params, model) => {
@@ -311,12 +332,12 @@ const Delete = (params, model) => {
 
 // Delete User Admin
 Delete("/:id", M_Administrator);
-// Delete User PJ Event
-Delete("/pjEvent/:id", M_pjEvent);
-// Delete User PJ Anggota
-Delete("/pjAnggota/:id", M_pjAnggota);
-// Delete User PJ Dokumen
-Delete("/pjDokumen/:id", M_pjDokumen);
+// // Delete User PJ Event
+// Delete("/pjEvent/:id", M_pjEvent);
+// // Delete User PJ Anggota
+// Delete("/pjAnggota/:id", M_pjAnggota);
+// // Delete User PJ Dokumen
+// Delete("/pjDokumen/:id", M_pjDokumen);
 
 // ========================= CLOSED USER  =================================== //
 
@@ -337,6 +358,7 @@ router.post("/data/anggota", auth, async (req, res) => {
     angkatan,
     foto,
     email,
+    divisi_id,
     instagram,
     twitter,
     whatsapp,
@@ -365,6 +387,7 @@ router.post("/data/anggota", auth, async (req, res) => {
         angkatan,
         foto,
         nim,
+        divisi_id,
         jabatan,
         angkatan,
         foto,
@@ -383,8 +406,11 @@ router.post("/data/anggota", auth, async (req, res) => {
         facebook,
         anggota_id: anggotaId.id,
       });
-
-      res.status(200).send("Anggota Successfully Created");
+      delete anggota.dataValues["id"];
+      delete anggota.dataValues["agama_id"];
+      delete sosmed.dataValues[("id", "anggota_id")];
+      const data = { ...anggota.dataValues, ...sosmed.dataValues };
+      res.status(200).send(data);
     }
   } catch (error) {
     console.error(error.message);
@@ -400,12 +426,15 @@ router.get("/data/anggota", auth, async (req, res) => {
         {
           model: M_Sosmed,
           required: true,
+          attributes: { exclude: ["id", "anggota_id"] },
         },
         {
           model: M_Agama,
           required: true,
+          attributes: { exclude: ["id"] },
         },
       ],
+      attributes: { exclude: ["id", "agama_id"] },
     });
     res.json(anggota);
   } catch (error) {
@@ -415,26 +444,31 @@ router.get("/data/anggota", auth, async (req, res) => {
 });
 
 // GET Single Data Anggota
-router.get("/data/anggota/:id", auth, async (req, res) => {
+router.get("/data/anggota/:username", auth, async (req, res) => {
   try {
-    const check = await M_Anggota.findOne({ where: { id: req.params.id } });
+    const check = await M_Anggota.findOne({
+      where: { username: req.params.username },
+    });
     if (!check) {
       res
         .status(400)
-        .send({ errors: { msg: "There is no anggota with that ID" } });
+        .send({ errors: { msg: "There is no anggota with that username" } });
     } else {
       const anggota = await M_Anggota.findOne({
-        where: { id: req.params.id },
+        where: { username: req.params.username },
         include: [
           {
             model: M_Sosmed,
             required: true,
+            attributes: { exclude: ["id", "anggota_id"] },
           },
           {
             model: M_Agama,
             required: true,
+            attributes: { exclude: ["id"] },
           },
         ],
+        attributes: { exclude: ["id", "agama_id"] },
       });
       res.json(anggota);
     }
@@ -473,7 +507,7 @@ router.delete("/data/anggota/:id", auth, async (req, res) => {
 });
 
 // Update Data Anggota
-router.put("/data/anggota/:id", auth, async (req, res) => {
+router.put("/data/anggota/:nim", auth, async (req, res) => {
   const {
     nim,
     jabatan,
@@ -489,11 +523,11 @@ router.put("/data/anggota/:id", auth, async (req, res) => {
   } = req.body;
   try {
     const check = await M_Anggota.findOne({
-      where: { id: req.params.id },
+      where: { nim: req.params.nim },
     });
     if (!check) {
       res.status(400).send({
-        errors: { msg: "There is no Anggota with that ID" },
+        errors: { msg: "There is no Anggota with that NIM" },
       });
     } else {
       const adminId = await M_Administrator.findByPk(req.user.id);
@@ -513,7 +547,7 @@ router.put("/data/anggota/:id", auth, async (req, res) => {
           updated_by: adminId.nama,
         },
         {
-          where: { id: req.params.id },
+          where: { nim: req.params.nim },
         }
       );
       res.status(200).send("Anggota Successfully Updated");
@@ -525,15 +559,15 @@ router.put("/data/anggota/:id", auth, async (req, res) => {
 });
 
 // Update Data Sosmed
-router.put("/data/sosmed/:id", auth, async (req, res) => {
+router.put("/data/sosmed/:nim", auth, async (req, res) => {
   const { email, facebook, twitter, instagram, whatsapp } = req.body;
   try {
-    const check = await M_Sosmed.findOne({
-      where: { id: req.params.id },
+    const check = await M_Anggota.findOne({
+      where: { nim: req.params.nim },
     });
     if (!check) {
       res.status(400).send({
-        errors: { msg: "There is no Sosmed with that ID" },
+        errors: { msg: "There is no anggota with that NIM" },
       });
     } else {
       const sosmed = await M_Sosmed.update(
@@ -545,7 +579,7 @@ router.put("/data/sosmed/:id", auth, async (req, res) => {
           whatsapp,
         },
         {
-          where: { id: req.params.id },
+          where: { anggota_id: check.anggota_id },
         }
       );
       res.status(200).send("Sosmed Successfully Updated");
@@ -611,8 +645,10 @@ router.get("/data/event", auth, async (req, res) => {
         {
           model: M_Tamu,
           required: true,
+          attributes: { exclude: ["id", "event_id"] },
         },
       ],
+      attributes: { exclude: ["id"] },
     });
     res.json(event);
   } catch (error) {
@@ -622,24 +658,26 @@ router.get("/data/event", auth, async (req, res) => {
 });
 
 // Get Single Event
-router.get("/data/event/:id", auth, async (req, res) => {
+router.get("/data/event/:nama", auth, async (req, res) => {
   try {
     const check = await M_Event.findOne({
-      where: { id: req.params.id },
+      where: { nama: req.params.nama },
     });
     if (!check) {
       res
         .status(400)
-        .send({ errors: { msg: "There is no Event with that ID" } });
+        .send({ errors: { msg: "There is no Event with that event name" } });
     } else {
       const event = await M_Event.findOne({
-        where: { id: req.params.id },
+        where: { nama: req.params.nama },
         include: [
           {
             model: M_Tamu,
             required: true,
+            attributes: { exclude: ["id", "event_id"] },
           },
         ],
+        attributes: { exclude: ["id"] },
       });
       res.json(event);
     }
@@ -676,16 +714,16 @@ router.delete("/data/event/:id", auth, async (req, res) => {
 });
 
 // Update Data Event
-router.put("/data/event/:id", auth, async (req, res) => {
+router.put("/data/event/:nama", auth, async (req, res) => {
   const { nama, description, harga, rules, poster, lokasi, tanggal } = req.body;
   try {
     const check = await M_Event.findOne({
-      where: { id: req.params.id },
+      where: { nama: req.params.nama },
     });
     if (!check) {
       res
         .status(400)
-        .send({ errors: { msg: "There is no Event with that ID" } });
+        .send({ errors: { msg: "There is no Event with that event name" } });
     } else {
       const event = await M_Event.update(
         {
@@ -697,7 +735,7 @@ router.put("/data/event/:id", auth, async (req, res) => {
           lokasi,
           tanggal,
         },
-        { where: { id: req.params.id } }
+        { where: { nama: req.params.nama } }
       );
       res.status(200).send("Event Successfully Updated");
     }
@@ -709,19 +747,19 @@ router.put("/data/event/:id", auth, async (req, res) => {
 
 // Update Data Tamu
 // Update Data Event
-router.put("/data/tamu/:id", auth, async (req, res) => {
+router.put("/data/tamu/:nama", auth, async (req, res) => {
   const { nama_tamu_1, nama_tamu_2, nama_tamu_3 } = req.body;
   try {
-    const check = await M_Tamu.findOne({
-      where: { id: req.params.id },
+    const check = await M_Event.findOne({
+      where: { nama: req.params.nama },
     });
     if (!check) {
       res
         .status(400)
-        .send({ errors: { msg: "There is no Event with that ID" } });
+        .send({ errors: { msg: "There is no Event with that event name" } });
     } else {
       const eventId = await M_Event.findOne({
-        where: { id: req.params.id },
+        where: { nama: req.params.nama },
       });
       const tamu = await M_Tamu.update(
         {
@@ -730,7 +768,7 @@ router.put("/data/tamu/:id", auth, async (req, res) => {
           nama_tamu_3,
           event_id: eventId.id,
         },
-        { where: { id: req.params.id } }
+        { where: { event_id: eventId.event_id } }
       );
       res.status(200).send("Tamu Successfully Updated");
     }
@@ -760,11 +798,11 @@ router.post("/data/pengunjung", auth, async (req, res) => {
 });
 
 // Post Data Pengunjung
-router.post("/data/pengunjung/:event_id", auth, async (req, res) => {
+router.post("/data/pengunjung/:event_name", auth, async (req, res) => {
   const { nama_depan, nama_belakang, email, no_telp } = req.body;
   try {
-    const event_id = await M_Event.findOne({
-      where: { id: req.params.event_id },
+    const event_name = await M_Event.findOne({
+      where: { nama: req.params.event_name },
     });
     const pengunjung = await M_Pengunjung.create({
       nama_depan,
@@ -773,7 +811,7 @@ router.post("/data/pengunjung/:event_id", auth, async (req, res) => {
       no_telp,
       event_id: event_id.id,
     });
-    res.status(200).send("Pengunjung Successfully Created");
+    res.status(200).send(pengunjung);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server Error");
@@ -788,8 +826,10 @@ router.get("/data/pengunjung", auth, async (req, res) => {
         {
           model: M_Event,
           required: true,
+          attributes: { exclude: ["id"] },
         },
       ],
+      attributes: { exclude: ["id", "event_id"] },
     });
     res.json(pengunjung);
   } catch (error) {
@@ -799,23 +839,25 @@ router.get("/data/pengunjung", auth, async (req, res) => {
 });
 
 // Get Single Data Pengunjung
-router.get("/data/pengunjung/:id", auth, async (req, res) => {
+router.get("/data/pengunjung/:email", auth, async (req, res) => {
   try {
     const check = await M_Pengunjung.findOne({
-      where: { id: req.params.id },
+      where: { email: req.params.email },
     });
     if (!check) {
       res
         .status(400)
-        .send({ errors: { msg: "There is no Pengunjung with that ID" } });
+        .send({ errors: { msg: "There is no Pengunjung with that email" } });
     } else {
       const pengunjung = await M_Pengunjung.findOne({
         include: [
           {
             model: M_Event,
             required: true,
+            attributes: { exclude: ["id"] },
           },
         ],
+        attributes: { exclude: ["id"] },
       });
       res.json(pengunjung);
     }
@@ -826,16 +868,16 @@ router.get("/data/pengunjung/:id", auth, async (req, res) => {
 });
 
 // Update Data Pengunjung
-router.put("/data/pengunjung/:id", auth, async (req, res) => {
+router.put("/data/pengunjung/:email", auth, async (req, res) => {
   const { nama_depan, nama_belakang, email, no_telp } = req.body;
   try {
     const check = await M_Pengunjung.findOne({
-      where: { id: req.params.id },
+      where: { email: req.params.email },
     });
     if (!check) {
       res
         .status(400)
-        .send({ errors: { msg: "There is no Pengunjung with that ID" } });
+        .send({ errors: { msg: "There is no Pengunjung with that email" } });
     } else {
       const adminId = await M_Administrator.findByPk(req.user.id);
       const pengunjung = await M_Pengunjung.update(
@@ -845,7 +887,7 @@ router.put("/data/pengunjung/:id", auth, async (req, res) => {
           email,
           no_telp,
         },
-        { where: { id: req.params.id } }
+        { where: { email: req.params.email } }
       );
       res.status(200).send("Pengunjung Successfully Updated");
     }
@@ -880,13 +922,13 @@ router.delete("/data/pengunjung/:id", auth, async (req, res) => {
 // ========================= CLOSED EVENT  ==================================== //
 
 router.post("/data/dokumen", auth, async (req, res) => {
-  const { nama, description, tipe_file, sifat, file } = req.body;
+  const { nama, description, tipe_file, jenis_file, file } = req.body;
   try {
     const admin = await M_Administrator.findByPk(req.user.id);
     const dokumen = await M_Dokumen.create({
       nama,
       description,
-      sifat,
+      jenis_file,
       tipe_file,
       created_by: admin.id,
       file,
@@ -898,21 +940,21 @@ router.post("/data/dokumen", auth, async (req, res) => {
   }
 });
 
-router.put("/data/dokumen/:id", auth, async (req, res) => {
-  const { nama, description, tipe_file, sifat, file } = req.body;
+router.put("/data/dokumen/:nama_dokumen", auth, async (req, res) => {
+  const { nama, description, tipe_file, jenis_file, file } = req.body;
   try {
     const check = await M_Dokumen.findOne({
-      where: { id: req.params.id },
+      where: { nama: req.params.nama_dokumen },
     });
     if (!check) {
-      res
-        .status(400)
-        .send({ errors: { msg: "There is no Dokumen with that ID" } });
+      res.status(400).send({
+        errors: { msg: "There is no Dokumen with that nama dokumen" },
+      });
     } else {
       const dokumen = await M_Dokumen.update({
         nama,
         description,
-        sifat,
+        jenis_file,
         tipe_file,
         file,
       });
@@ -947,7 +989,9 @@ router.delete("/data/dokumen/:id", auth, async (req, res) => {
 
 router.get("/data/dokumen", auth, async (req, res) => {
   try {
-    const dokumen = await M_Dokumen.findAll();
+    const dokumen = await M_Dokumen.findAll({
+      attributes: { exclude: ["id"] },
+    });
     res.json(dokumen);
   } catch (error) {
     console.error(error.message);
@@ -955,15 +999,16 @@ router.get("/data/dokumen", auth, async (req, res) => {
   }
 });
 
-router.get("/data/dokumen/:id", auth, async (req, res) => {
+router.get("/data/dokumen/:nama_dokumen", auth, async (req, res) => {
   try {
     const dokumen = await M_Dokumen.findOne({
-      where: { id: req.params.id },
+      where: { nama: req.params.nama_dokumen },
+      attributes: { exclude: ["id"] },
     });
     if (!dokumen) {
-      res
-        .status(400)
-        .send({ errors: { msg: "There is no Dokumen with that ID" } });
+      res.status(400).send({
+        errors: { msg: "There is no Dokumen with that nama dokumen" },
+      });
     } else {
       res.json(dokumen);
     }

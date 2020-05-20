@@ -15,6 +15,34 @@ module.exports = {
         },
       ]),
 
+      queryInterface.bulkInsert("divisi", [
+        {
+          divisi: "Administrator",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          divisi: "Event",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          divisi: "Anggota",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          divisi: "Dokumen",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          divisi: "None",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]),
+
       queryInterface.bulkInsert("agama", [
         {
           agama: "Islam",

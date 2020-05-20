@@ -29,7 +29,7 @@ const penanggungJawab = (model) => {
     {
       username: notNullString(15),
       password: notNullString(255),
-      nama: notNullString(35),
+      anggota_id: notNullInteger(),
       created_by: nullableString(35),
       updated_by: nullableString(35),
     },

@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 
 const db = require("./database/database");
+require("dotenv").config();
 
 // Router
 const administrators = require("./routes/api/administrators");
@@ -26,8 +27,8 @@ app.use(
 app.use("/api/auth", auth);
 app.use("/api/administrators", administrators);
 
-const PORT = process.env.PORT || 8000;
+const port = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server Started on PORT ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server Started on PORT ${port}`);
 });

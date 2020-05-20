@@ -20,6 +20,17 @@ const M_Agama = db.define(
   }
 );
 
+const M_Divisi = db.define(
+  "divisi",
+  {
+    divisi: notNullString(100),
+  },
+  {
+    freezeTableName: true,
+    onDelete: "CASCADE",
+  }
+);
+
 const M_Anggota = db.define(
   "anggota",
   {
@@ -36,6 +47,7 @@ const M_Anggota = db.define(
     nim: notNullString(15),
     jabatan: notNullString(50),
     angkatan: notNullString(4),
+    divisi_id: notNullInteger(),
     foto: notNullString(255),
     created_by: notNullString(35),
     updated_by: nullableString(35),
@@ -71,6 +83,16 @@ M_Anggota.hasOne(M_Sosmed, {
   onDelete: "CASCADE",
 });
 
+M_Anggota.belongsTo(M_Divisi, {
+  foreignKey: "divisi_id",
+  onDelete: "CASCADE",
+});
+
+M_Divisi.hasMany(M_Anggota, {
+  foreignKey: "divisi_id",
+  onDelete: "CASCADE",
+});
+
 M_Anggota.belongsTo(M_Agama, {
   foreignKey: "agama_id",
   onDelete: "CASCADE",
@@ -85,4 +107,5 @@ module.exports = {
   M_Agama,
   M_Anggota,
   M_Sosmed,
+  M_Divisi,
 };

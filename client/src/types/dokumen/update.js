@@ -1,0 +1,2 @@
+export const DOKUMEN_UPDATED = "DOKUMEN_UPDATED";
+export const UPDATE_ERROR = "UPDATE_ERROR";

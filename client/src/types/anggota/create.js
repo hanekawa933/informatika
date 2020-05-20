@@ -1,0 +1,2 @@
+export const ANGGOTA_CREATED = "ANGGOTA_CREATED";
+export const CREATE_ERROR = "CREATE_ERROR";

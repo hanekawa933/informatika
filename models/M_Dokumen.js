@@ -14,11 +14,11 @@ const M_Dokumen = db.define(
   {
     nama: notNullString(70),
     description: notNullText(),
-    sifat: notNullString(20),
+    jenis_file: notNullString(20),
     tipe_file: notNullString(20),
     file: notNullString(255),
     created_by: notNullString(35),
-    updated_by: notNullString(35),
+    updated_by: nullableString(35),
   },
   {
     freezeTableName: true,
