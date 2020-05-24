@@ -3,6 +3,7 @@ import { ANGGOTA_CREATED, CREATE_ERROR } from "../../types/anggota/create";
 const initialState = {
   anggota: [],
   success: null,
+  errors: null,
 };
 
 export default function (state = initialState, action) {
@@ -20,6 +21,7 @@ export default function (state = initialState, action) {
         ...state,
         success: false,
         anggota: [],
+        errors: payload,
       };
     default:
       return state;

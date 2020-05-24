@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import image from "../../images/img_avatar.png";
 import "./Sidebar.css";
 import { logout } from "../../actions/auth";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import { loadUser } from "../../actions/auth";
 
-const Sidebar = ({ logout, ...props }) => {
+const Sidebar = ({ loadUser, user, logout, ...props }) => {
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
   return (
     <div
       sidebar={props.sidebar}
@@ -21,7 +25,7 @@ const Sidebar = ({ logout, ...props }) => {
       <nav className="w-100 my-5">
         <ul className="navbar-nav d-flex justify-content-center align-items-center">
           <li className="nav-item w-100">
-            <Link to="#" className="nav-link text-light">
+            <Link to="/admin/dashboard" className="nav-link text-light">
               <i className="fas fa-home mx-5 fs-20"></i>
               <span>Beranda</span>
             </Link>
@@ -81,7 +85,7 @@ const Sidebar = ({ logout, ...props }) => {
           <div className="collapse w-100" id="lihatData">
             <li className="nav-item w-100">
               <Link
-                to="/admin/data/anggota"
+                to="/admin/view/anggota"
                 className="nav-link text-light my-3 mx-5"
               >
                 Lihat Data Anggota
@@ -89,7 +93,7 @@ const Sidebar = ({ logout, ...props }) => {
             </li>
             <li className="nav-item w-100">
               <Link
-                to="/admin/data/dokumen"
+                to="/admin/view/dokumen"
                 className="nav-link text-light my-3 mx-5"
                 href="!#"
               >
@@ -98,7 +102,7 @@ const Sidebar = ({ logout, ...props }) => {
             </li>
             <li className="nav-item w-100">
               <Link
-                to="/admin/data/event"
+                to="/admin/view/event"
                 className="nav-link text-light my-3 mx-5"
                 href="!#"
               >
@@ -108,12 +112,22 @@ const Sidebar = ({ logout, ...props }) => {
           </div>
           <li className="nav-item w-100">
             <Link
-              to="/admin/data/change profile"
+              to={`/admin/data/change_username/${user.username}`}
               className="nav-link text-light "
               href="!#"
             >
               <i className="fas fa-user-alt mx-5 fs-20"></i>
-              <span>Ganti Data Pribadi</span>
+              <span>Ganti Username</span>
+            </Link>
+          </li>
+          <li className="nav-item w-100">
+            <Link
+              to={`/admin/data/change_password/${user.username}`}
+              className="nav-link text-light "
+              href="!#"
+            >
+              <i className="fas fa-user-alt mx-5 fs-20"></i>
+              <span>Ganti Password</span>
             </Link>
           </li>
           <li className="nav-item w-100">
@@ -129,7 +143,9 @@ const Sidebar = ({ logout, ...props }) => {
 };
 
 const mapStateToProps = (state) => ({
-  isAuthenticated: state.isAuthenticated,
+  isAuthenticated: state.auth.isAuthenticated,
+  user: state.auth.user,
+  auth: state.auth,
 });
 
-export default connect(mapStateToProps, { logout })(Sidebar);
+export default connect(mapStateToProps, { logout, loadUser })(Sidebar);

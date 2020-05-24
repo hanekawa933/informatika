@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Sidebar from "../../Sidebar";
 import Footer from "../../Footer";
 import { connect } from "react-redux";
-import PropTypes from "prop-types";
 import { createAnggota } from "../../../actions/anggota/create";
 import { Redirect } from "react-router-dom";
 
@@ -12,13 +11,13 @@ const Create = ({ success, createAnggota }) => {
     nama_belakang: "",
     tempat: "",
     tgl_lahir: "",
-    agama_id: "",
+    agama_id: 1,
     alamat: "",
     pekerjaan: "",
     nim: "",
     jabatan: "",
     angkatan: "",
-    divisi_id: "",
+    divisi_id: 1,
     foto: "",
     email: "",
     instagram: "",
@@ -45,13 +44,12 @@ const Create = ({ success, createAnggota }) => {
     whatsapp,
   } = formData;
 
-  const onChange = (e) => {
+  const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    createAnggota(
+    createAnggota({
       nama_depan,
       nama_belakang,
       tempat,
@@ -66,8 +64,8 @@ const Create = ({ success, createAnggota }) => {
       instagram,
       twitter,
       facebook,
-      whatsapp
-    );
+      whatsapp,
+    });
   };
 
   if (success) {
@@ -206,7 +204,7 @@ const Create = ({ success, createAnggota }) => {
               <input
                 type="file"
                 className="form-control-file"
-                name="file"
+                name="foto"
                 onChange={(e) => onChange(e)}
               />
             </div>
@@ -281,8 +279,8 @@ const Create = ({ success, createAnggota }) => {
 };
 
 const mapStateToProps = (state) => ({
-  anggota: state.anggota,
-  success: state.success,
+  anggota: state.createAnggota.anggota,
+  success: state.createAnggota.success,
 });
 
 export default connect(mapStateToProps, { createAnggota })(Create);

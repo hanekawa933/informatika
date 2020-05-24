@@ -62,22 +62,6 @@ module.exports = {
       };
     };
 
-    const references = (refTable) => {
-      return {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: {
-            tableName: refTable,
-          },
-          key: "id",
-          onDelete: "CASCADE",
-          onUpdate: "CASCADE",
-          hooks: true,
-        },
-      };
-    };
-
     const administrator = (tableName) => {
       queryInterface.createTable(tableName, {
         id: PKCascade(),
@@ -94,7 +78,7 @@ module.exports = {
         id: PKCascade(),
         username: notNullString(15),
         password: notNullString(255),
-        anggota_id: references("anggota"),
+        anggota_id: notNullInteger(),
         created_by: notNullString(35),
         updated_by: nullableString(35),
         createdAt: notNullDate(),
@@ -130,28 +114,19 @@ module.exports = {
           type: Sequelize.DATEONLY,
           allowNull: false,
         },
-        agama_id: references("agama"),
-        alamat: notNullString(),
-        pekerjaan: notNullString(100),
+        agama_id: notNullInteger(),
         nim: notNullString(15),
         jabatan: notNullString(50),
         angkatan: notNullString(4),
-        divisi_id: references("divisi"),
+        divisi_id: notNullInteger(),
         foto: notNullString(255),
-        created_by: nullableString(35),
-        updated_by: nullableString(35),
-        createdAt: notNullDate(),
-        updatedAt: notNullDate(),
-      }),
-
-      queryInterface.createTable("sosmed", {
-        id: PKCascade(),
         email: notNullString(30),
         instagram: nullableString(30),
         twitter: nullableString(30),
         facebook: nullableString(30),
         whatsapp: notNullString(30),
-        anggota_id: references("anggota"),
+        created_by: nullableString(35),
+        updated_by: nullableString(35),
         createdAt: notNullDate(),
         updatedAt: notNullDate(),
       }),
@@ -164,7 +139,18 @@ module.exports = {
         rules: notNullText(),
         poster: notNullString(255),
         lokasi: notNullString(255),
-        tanggal: notNullDate(),
+        tanggal: {
+          type: Sequelize.DATEONLY,
+          allowNull: false,
+        },
+        jam_mulai: {
+          type: Sequelize.TIME,
+          allowNull: false,
+        },
+        jam_berakhir: {
+          type: Sequelize.TIME,
+          allowNull: false,
+        },
         created_by: nullableString(35),
         updated_by: nullableString(35),
         createdAt: notNullDate(),
@@ -181,24 +167,22 @@ module.exports = {
           type: Sequelize.STRING(12),
           defaultValue: "tidak aktif",
         },
-        event_id: references("event"),
+        event_id: notNullInteger(),
         createdAt: notNullDate(),
         updatedAt: notNullDate(),
       }),
 
       queryInterface.createTable("tamu", {
         id: primaryKey(),
-        nama_tamu_1: notNullString(70),
-        nama_tamu_2: nullableString(70),
-        nama_tamu_3: nullableString(70),
-        event_id: references("event"),
+        nama_tamu: notNullString(70),
+        event_id: notNullInteger(),
         createdAt: notNullDate(),
         updatedAt: notNullDate(),
       }),
 
       queryInterface.createTable("tiket", {
         id: primaryKey(),
-        pengunjung_id: references("pengunjung"),
+        pengunjung_id: notNullInteger(),
         createdAt: notNullDate(),
         updatedAt: notNullDate(),
       }),
@@ -220,19 +204,18 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return Promise.all([
-      queryInterface.dropTable("administrator", { cascade: true }),
-      queryInterface.dropTable("divisi", { cascade: true }),
-      queryInterface.dropTable("admin_divisi", { cascade: true }),
-      queryInterface.dropTable("pjAnggota", { cascade: true }),
-      queryInterface.dropTable("pjDokumen", { cascade: true }),
-      queryInterface.dropTable("pjEvent", { cascade: true }),
-      queryInterface.dropTable("sosmed"),
-      queryInterface.dropTable("agama", { cascade: true }),
-      queryInterface.dropTable("pengunjung", { cascade: true }),
-      queryInterface.dropTable("tamu", { cascade: true }),
+      queryInterface.dropTable("administrator"),
+      queryInterface.dropTable("divisi"),
+      queryInterface.dropTable("admin_divisi"),
+      queryInterface.dropTable("pjAnggota"),
+      queryInterface.dropTable("pjDokumen"),
+      queryInterface.dropTable("pjEvent"),
+      queryInterface.dropTable("agama"),
+      queryInterface.dropTable("pengunjung"),
+      queryInterface.dropTable("tamu"),
       queryInterface.dropTable("dokumen"),
-      queryInterface.dropTable("anggota", { cascade: true }),
-      queryInterface.dropTable("event", { cascade: true }),
+      queryInterface.dropTable("anggota"),
+      queryInterface.dropTable("event"),
       queryInterface.dropTable("tiket"),
     ]);
   },

@@ -2,7 +2,12 @@ import axios from "axios";
 
 import setAuthToken from "../utils/setAuthToken";
 
-import { AUTH_ERROR } from "../types/auth";
+import {
+  AUTH_ERROR,
+  CHANGE_PASSWORD,
+  CHANGE_USERNAME,
+  CHANGE_FAILED,
+} from "../types/auth";
 
 import {
   USER_LOADED,
@@ -23,9 +28,13 @@ export const loadUser = () => async (dispatch) => {
       type: USER_LOADED,
       payload: res.data,
     });
-  } catch (err) {
+  } catch (error) {
     dispatch({
       type: AUTH_ERROR,
+      payload: {
+        msg: error.response.statusText,
+        status: error.response.status,
+      },
     });
   }
 };
@@ -48,7 +57,7 @@ export const login = (username, password) => async (dispatch) => {
     });
 
     dispatch(loadUser());
-  } catch (err) {
+  } catch (error) {
     // const errors = err.response.data.errors;
 
     // if (errors) {
@@ -57,6 +66,10 @@ export const login = (username, password) => async (dispatch) => {
 
     dispatch({
       type: LOGIN_FAILED,
+      payload: {
+        msg: error.response.statusText,
+        status: error.response.status,
+      },
     });
   }
 };
@@ -66,4 +79,58 @@ export const logout = () => (dispatch) => {
   dispatch({
     type: LOGOUT,
   });
+};
+
+// Change Password
+export const changePassword = (username, password, newPassword) => async (
+  dispatch
+) => {
+  const config = {
+    headers: { "Content-Type": "application/json" },
+  };
+
+  const body = JSON.stringify({ password, newPassword });
+
+  try {
+    const res = await axios.put(`/api/auth/password/${username}`, body, config);
+    dispatch({
+      type: CHANGE_PASSWORD,
+      payload: res.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: CHANGE_FAILED,
+      payload: {
+        msg: error.response.statusText,
+        status: error.response.status,
+      },
+    });
+  }
+};
+
+// Change Password
+export const changeUsername = (usernameParams, username, password) => async (
+  dispatch
+) => {
+  const config = {
+    headers: { "Content-Type": "application/json" },
+  };
+
+  const body = JSON.stringify({ username, password });
+
+  try {
+    const res = await axios.put(`/api/auth/${usernameParams}`, body, config);
+    dispatch({
+      type: CHANGE_USERNAME,
+      payload: res.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: CHANGE_FAILED,
+      payload: {
+        msg: error.response.statusText,
+        status: error.response.status,
+      },
+    });
+  }
 };

@@ -21,7 +21,18 @@ const M_Event = db.define(
     rules: notNullText(),
     poster: notNullString(),
     lokasi: notNullString(255),
-    tanggal: notNullDate(),
+    tanggal: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    jam_mulai: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    jam_berakhir: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
     created_by: notNullString(35),
     updated_by: nullableString(35),
   },
@@ -53,9 +64,7 @@ const M_Pengunjung = db.define(
 const M_Tamu = db.define(
   "tamu",
   {
-    nama_tamu_1: notNullString(70),
-    nama_tamu_2: nullableString(70),
-    nama_tamu_3: nullableString(70),
+    nama_tamu: notNullString(70),
     event_id: notNullInteger(),
   },
   {

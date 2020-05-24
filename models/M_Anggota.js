@@ -16,7 +16,6 @@ const M_Agama = db.define(
   },
   {
     freezeTableName: true,
-    onDelete: "CASCADE",
   }
 );
 
@@ -27,7 +26,6 @@ const M_Divisi = db.define(
   },
   {
     freezeTableName: true,
-    onDelete: "CASCADE",
   }
 );
 
@@ -42,70 +40,42 @@ const M_Anggota = db.define(
       allowNull: false,
     },
     agama_id: notNullInteger(),
-    alamat: notNullString(),
-    pekerjaan: notNullString(100),
     nim: notNullString(15),
     jabatan: notNullString(50),
     angkatan: notNullString(4),
     divisi_id: notNullInteger(),
     foto: notNullString(255),
-    created_by: notNullString(35),
-    updated_by: nullableString(35),
-  },
-  {
-    freezeTableName: true,
-    onDelete: "CASCADE",
-  }
-);
-
-const M_Sosmed = db.define(
-  "sosmed",
-  {
     email: notNullString(30),
     instagram: nullableString(30),
     twitter: nullableString(30),
     facebook: nullableString(30),
     whatsapp: notNullString(30),
+    created_by: notNullString(35),
+    updated_by: nullableString(35),
   },
   {
     freezeTableName: true,
   }
 );
 
-// Association
-M_Sosmed.belongsTo(M_Anggota, {
-  foreignKey: "anggota_id",
-  onDelete: "CASCADE",
-});
-
-M_Anggota.hasOne(M_Sosmed, {
-  foreignKey: "anggota_id",
-  onDelete: "CASCADE",
-});
-
 M_Anggota.belongsTo(M_Divisi, {
   foreignKey: "divisi_id",
-  onDelete: "CASCADE",
 });
 
 M_Divisi.hasMany(M_Anggota, {
   foreignKey: "divisi_id",
-  onDelete: "CASCADE",
 });
 
 M_Anggota.belongsTo(M_Agama, {
   foreignKey: "agama_id",
-  onDelete: "CASCADE",
 });
 
 M_Agama.hasMany(M_Anggota, {
   foreignKey: "agama_id",
-  onDelete: "CASCADE",
 });
 
 module.exports = {
   M_Agama,
   M_Anggota,
-  M_Sosmed,
   M_Divisi,
 };

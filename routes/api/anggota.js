@@ -126,7 +126,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 // GET All Data Anggota
-router.get("/", auth, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const anggota = await M_Anggota.findAll({
       include: [
@@ -141,7 +141,7 @@ router.get("/", auth, async (req, res) => {
           attributes: { exclude: ["id"] },
         },
       ],
-      attributes: { exclude: ["id", "agama_id"] },
+      attributes: { exclude: ["id", "agama_id", "divisi_id"] },
     });
     res.json(anggota);
   } catch (error) {
@@ -151,7 +151,7 @@ router.get("/", auth, async (req, res) => {
 });
 
 // GET Single Data Anggota
-router.get("/:nim", auth, async (req, res) => {
+router.get("/:nim", async (req, res) => {
   try {
     const check = await M_Anggota.findOne({
       where: { nim: req.params.nim },
@@ -253,30 +253,83 @@ router.put("/:nim", auth, async (req, res) => {
           ],
         });
       } else {
-        const adminId = await M_Administrator.findByPk(req.user.id);
-        const anggota = await M_Anggota.update(
-          {
-            firstName,
-            lastName,
-            tempat,
-            tgl_lahir,
-            agama_id,
-            nim,
-            jabatan,
-            angkatan,
-            foto,
-            whatsapp,
-            email,
-            facebook,
-            twitter,
-            instagram,
-            updated_by: adminId.nama,
-          },
-          {
-            where: { nim: req.params.nim },
-          }
-        );
-        res.status(200).send("Anggota Successfully Updated");
+        const admin = await M_Administrator.findOne({
+          where: { username: req.user.username },
+          attributes: { exclude: ["id"] },
+        });
+
+        const divisi = await M_Admin_Divisi.findOne({
+          where: { username: req.user.username },
+          attributes: { exclude: ["id", "anggota_id"] },
+          include: [
+            {
+              model: M_Anggota,
+              required: true,
+              attributes: { exclude: ["id", "agama_id", "divisi_id"] },
+              include: [
+                {
+                  model: M_Agama,
+                  required: true,
+                  attributes: { exclude: ["id"] },
+                },
+                {
+                  model: M_Divisi,
+                  required: true,
+                  attributes: { exclude: ["id"] },
+                },
+              ],
+            },
+          ],
+        });
+        if (admin) {
+          const anggota = await M_Anggota.update(
+            {
+              firstName,
+              lastName,
+              tempat,
+              tgl_lahir,
+              agama_id,
+              nim,
+              jabatan,
+              angkatan,
+              foto,
+              whatsapp,
+              email,
+              facebook,
+              twitter,
+              instagram,
+              updated_by: admin.nama,
+            },
+            {
+              where: { nim: req.params.nim },
+            }
+          );
+          res.status(200).send("Anggota Successfully Updated");
+        } else {
+          const anggota = await M_Anggota.update(
+            {
+              firstName,
+              lastName,
+              tempat,
+              tgl_lahir,
+              agama_id,
+              nim,
+              jabatan,
+              angkatan,
+              foto,
+              whatsapp,
+              email,
+              facebook,
+              twitter,
+              instagram,
+              updated_by: divisi.nama_depan + " " + divisi.nama_belakang,
+            },
+            {
+              where: { nim: req.params.nim },
+            }
+          );
+          res.status(200).send("Anggota Successfully Updated");
+        }
       }
     }
   } catch (error) {

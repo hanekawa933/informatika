@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Profile from "../../../images/img_avatar.png";
 import Navbar from "../../Navbar";
+import { profileAnggota } from "../../../actions/anggota/read";
+import { connect } from "react-redux";
 
-const ProfileAnggota = () => {
+const ProfileAnggota = ({ profileAnggota, profile, match }) => {
+  useEffect(() => {
+    profileAnggota(match.params.nim);
+  }, [profileAnggota, match.params.nim]);
   return (
     <div>
       <Navbar />
@@ -14,17 +19,24 @@ const ProfileAnggota = () => {
           <div className="col-lg-9 col-md-12 col-sm-12">
             <div className="card">
               <div className="card-body">
-                <h5>Nama : Muhammad Iqbal Ramadhan</h5>
-                <h5>Tempat Tanggal Lahir : 27-11-2000, Purwokerto</h5>
-                <h5>Agama : Islam</h5>
-                <h5>NIM : 2018104313</h5>
-                <h5>Jabatan : Ketua</h5>
-                <h5>Angkatan : 2018</h5>
-                <h5>Email : iqbalkorompiz@gmail.com</h5>
-                <h5>Instagram : @hanekawa_shirayuki</h5>
-                <h5>Twitter : @hanekawa_hanbei</h5>
-                <h5>Facebook : Iqbal Ramadhan</h5>
-                <h5>WhatsApp : 082298546467</h5>
+                <h5>
+                  Nama Lengkap :
+                  {`${profile.nama_depan} ${profile.nama_belakang}`}
+                </h5>
+                <h5>
+                  Tempat Tanggal Lahir :{" "}
+                  {`${profile.tempat}, ${profile.tgl_lahir}`}
+                </h5>
+                <h5>Agama : {profile.agama && profile.agama.agama}</h5>
+                <h5>NIM : {profile.nim}</h5>
+                <h5>Jabatan : {profile.jabatan}</h5>
+                <h5>Angkatan : {profile.angkatan}</h5>
+                <h5>Divisi : {profile.divisi && profile.divisi.divisi}</h5>
+                <h5>Email : {profile.email}</h5>
+                <h5>Instagram : {profile.instagram}</h5>
+                <h5>Twitter : {profile.twitter}</h5>
+                <h5>Facebook : {profile.facebook}</h5>
+                <h5>WhatsApp : {profile.email}</h5>
               </div>
             </div>
           </div>
@@ -34,4 +46,7 @@ const ProfileAnggota = () => {
   );
 };
 
-export default ProfileAnggota;
+const mapStateToProps = (state) => ({
+  profile: state.readAnggota.profile,
+});
+export default connect(mapStateToProps, { profileAnggota })(ProfileAnggota);

@@ -3,7 +3,7 @@ import "./Subscription.css";
 
 const Subscription = () => {
   return (
-    <div className="row p-0 m-0 p-5 bg-subscription">
+    <div className="row p-0 m-0 p-5 bg-subscription" id="kontak">
       <div className="row vh-50 bg-light d-flex justify-content-center align-items-center">
         <div className="col-lg-12 col-md-12 col-sm-12 p-5 vh-50">
           <div className="row">
@@ -26,7 +26,7 @@ const Subscription = () => {
               <p>@hanekawa_hanbei</p>
             </div>
             <div className="col-lg-6 col-md-5 col-sm-12">
-              <div className="card">
+              <div className="card" style={{ zIndex: "8" }}>
                 <div className="card-body">
                   <div className="card-text text-uppercase my-3">
                     Send us message

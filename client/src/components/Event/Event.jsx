@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "../Navbar";
 import CardEvent from "../Card/CardEvent";
+import { readEvent } from "../../actions/event/read";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
-const Event = () => {
+const Event = ({ readEvent, event }) => {
+  useEffect(() => {
+    readEvent();
+  }, [readEvent]);
+
+  const dataEvent = event.map((listEvent, index) => {
+    return (
+      <CardEvent
+        nama={listEvent.nama}
+        lokasi={listEvent.lokasi}
+        tanggal={listEvent.tanggal}
+        jamMulai={listEvent.jam_mulai}
+        jamBerakhir={listEvent.jam_berakhir}
+        harga={listEvent.harga}
+      />
+    );
+  });
+
   return (
     <div>
       <Navbar />
@@ -17,9 +37,7 @@ const Event = () => {
             </li>
           </ol>
         </nav>
-        <div className="row">
-          <CardEvent />
-        </div>
+        <div className="row">{dataEvent}</div>
         <nav aria-label="breadcrumb" className="mt-5">
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
@@ -38,4 +56,8 @@ const Event = () => {
   );
 };
 
-export default Event;
+const mapStateToProps = (state) => ({
+  event: state.readEvent.event,
+});
+
+export default connect(mapStateToProps, { readEvent })(Event);
